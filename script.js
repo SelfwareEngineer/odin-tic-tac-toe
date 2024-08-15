@@ -4,13 +4,8 @@ const gameBoard = (function () {
   let board = [];
 
   function updateBoard(symbol, index) {
-    if (board[index] != " ") {
-      return 1;
-    } else {
-      board[index] = symbol;
-      render();
-      return 0;
-    }
+    board[index] = symbol;
+    render();
   }
 
   function clearBoard() {
@@ -18,14 +13,24 @@ const gameBoard = (function () {
     render();
   }
 
+  function disableBoard() {
+    for (let i = 0; i <= 8; i++) {
+      const targetSquare = document.querySelector(`[data-index="${i}"]`);
+      targetSquare.dataset.active = "false";
+    }
+  }
+
   function render() {
-    console.log("-------");
-    console.log("|" + board[0] + "|" + board[1] + "|" + board[2] + "|");
-    console.log("-------");
-    console.log("|" + board[3] + "|" + board[4] + "|" + board[5] + "|");
-    console.log("-------");
-    console.log("|" + board[6] + "|" + board[7] + "|" + board[8] + "|");
-    console.log("-------");
+    for (let i = 0; i <= 8; i++) {
+      const targetSquare = document.querySelector(`[data-index="${i}"]`);
+      const targetSquareText = targetSquare.querySelector("p");
+      targetSquareText.textContent = board[i];
+      if (board[i] === " ") {
+        targetSquare.dataset.active = "true";
+      } else {
+        targetSquare.dataset.active = "false";
+      }
+    }
   }
 
   function isGameOver() {
@@ -43,7 +48,6 @@ const gameBoard = (function () {
       (board[6] === board[4] && board[6] === board[2] && board[6] != " ")
     ) {
       return true;
-      // for some reason the console thinks `board` is an obj...?
     } else if (!board.includes(" ")) {
       return "tie";
     } else {
@@ -51,86 +55,30 @@ const gameBoard = (function () {
     }
   }
 
-  return { updateBoard, clearBoard, isGameOver };
+  return { updateBoard, clearBoard, disableBoard, isGameOver };
 })();
 
 const players = (function () {
-  let _playerList = [];
-
-  function createPlayer() {
-    // const playerName = prompt("Enter Player Name: ");
-
-    let playerNumber;
-    if (_playerList.length === 0) {
-      playerNumber = 1;
-    } else if (_playerList.length === 1) {
-      playerNumber = 2;
-    }
-
-    let playerSymbol;
-    if (_playerList.length === 0) {
-      playerSymbol = "X";
-    } else if (_playerList.length === 1) {
-      playerSymbol = "O";
-    }
-
-    console.log(
-      playerName +
-        " successfully added as Player " +
-        playerNumber +
-        " (" +
-        playerSymbol +
-        ").",
-    );
-
-    _playerList.push({ playerName, playerNumber, playerSymbol });
-  }
-
-  function clearPlayers() {
-    _playerList = [];
-  }
+  let _playerList = [
+    { playerName: "Player 1", playerSymbol: "X" },
+    { playerName: "Player 2", playerSymbol: "O" },
+  ];
 
   function getPlayerList() {
     return _playerList;
   }
 
-  return { createPlayer, clearPlayers, getPlayerList };
+  return { getPlayerList };
 })();
 
 const game = (function () {
   let currentPlayer = null;
-
-  function playGame() {
-    newGame();
-    while (!gameBoard.isGameOver()) {
-      playTurn();
-    }
-
-    const gameOver = gameBoard.isGameOver();
-    if (gameOver === "tie") {
-      console.log("It's a tie!");
-    } else {
-      console.log(currentPlayer.playerName + " wins!");
-    }
-
-    // let playAgain = prompt("Play again?").toLowerCase();
-    while (!["y", "n"].includes(playAgain)) {
-      // playAgain = prompt("Please select y or n. Play again?").toLowerCase();
-    }
-    if (playAgain === "y") {
-      playGame();
-    } else {
-      console.log("Goodbye!");
-    }
-  }
+  const turnNotification = document.querySelector("h2");
 
   function newGame() {
     gameBoard.clearBoard();
-    players.clearPlayers();
     currentPlayer = null;
-    for (let i = 1; i <= 2; i++) {
-      players.createPlayer();
-    }
+    playTurn();
   }
 
   function playTurn() {
@@ -143,16 +91,43 @@ const game = (function () {
         currentPlayer = players.getPlayerList()[0];
       }
     }
-    console.log("It's " + currentPlayer.playerName + "'s turn!");
-    // let playIndex = prompt("choose an index (0-8)");
-    while (gameBoard.updateBoard(currentPlayer.playerSymbol, playIndex) != 0) {
-      // playIndex = prompt(
-      // "Invalid choice; please choose an unoccupied index (0-8)",
-      // );
-    }
+    turnNotification.textContent =
+      "It's " + currentPlayer.playerName + "'s turn!";
+
+    document.addEventListener("click", (e) => {
+      const gameSquare = e.target.closest(".game-square");
+      if (gameSquare && gameSquare.dataset.active === "true") {
+        let playIndex = Number(gameSquare.dataset.index);
+        gameBoard.updateBoard(currentPlayer.playerSymbol, playIndex);
+
+        if (gameBoard.isGameOver() === "tie") {
+          turnNotification.textContent = "It's a Tie!";
+          gameBoard.disableBoard();
+          getPlayAgain();
+        } else if (gameBoard.isGameOver()) {
+          turnNotification.textContent = currentPlayer.playerName + " wins!";
+          gameBoard.disableBoard();
+          getPlayAgain();
+        } else {
+          playTurn();
+        }
+      }
+    });
   }
 
-  return { playGame };
+  function getPlayAgain() {
+    const playAgainButton = document.createElement("button");
+    playAgainButton.type = "button";
+    playAgainButton.classList += "play-again-button";
+    playAgainButton.textContent = "Play again?";
+    playAgainButton.addEventListener("click", () => {
+      newGame();
+      playAgainButton.remove();
+    });
+    turnNotification.insertAdjacentElement("afterend", playAgainButton);
+  }
+
+  return { newGame };
 })();
 
-game.playGame();
+game.newGame();
