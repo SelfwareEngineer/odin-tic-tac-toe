@@ -58,7 +58,7 @@ const players = (function () {
   let _playerList = [];
 
   function createPlayer() {
-    const playerName = prompt("Enter Player Name: ");
+    // const playerName = prompt("Enter Player Name: ");
 
     let playerNumber;
     if (_playerList.length === 0) {
@@ -113,9 +113,9 @@ const game = (function () {
       console.log(currentPlayer.playerName + " wins!");
     }
 
-    let playAgain = prompt("Play again?").toLowerCase();
+    // let playAgain = prompt("Play again?").toLowerCase();
     while (!["y", "n"].includes(playAgain)) {
-      playAgain = prompt("Please select y or n. Play again?").toLowerCase();
+      // playAgain = prompt("Please select y or n. Play again?").toLowerCase();
     }
     if (playAgain === "y") {
       playGame();
@@ -144,11 +144,11 @@ const game = (function () {
       }
     }
     console.log("It's " + currentPlayer.playerName + "'s turn!");
-    let playIndex = prompt("choose an index (0-8)");
+    // let playIndex = prompt("choose an index (0-8)");
     while (gameBoard.updateBoard(currentPlayer.playerSymbol, playIndex) != 0) {
-      playIndex = prompt(
-        "Invalid choice; please choose an unoccupied index (0-8)",
-      );
+      // playIndex = prompt(
+      // "Invalid choice; please choose an unoccupied index (0-8)",
+      // );
     }
   }
 

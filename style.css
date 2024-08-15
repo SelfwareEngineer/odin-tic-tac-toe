@@ -94,3 +94,57 @@ input:focus-visible {
 /* --------------------------------------------------- */
 /*                   END OF RESET                      */
 /* --------------------------------------------------- */
+
+.content {
+  --text-color: white;
+  background-color: hsl(221, 39%, 11%);
+  color: var(--text-color);
+  font-family: sans-serif;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+h2 {
+  padding-bottom: 1rem;
+}
+
+.game {
+  background-color: var(--text-color);
+  width: min(70vw, 70vh);
+  height: min(70vw, 70vh);
+  border-radius: 1.1rem;
+  display: grid;
+  grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.game-square {
+  background-color: hsl(215, 28%, 17%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.game-square[data-index="0"] {
+  border-radius: 1rem 0 0 0;
+}
+
+.game-square[data-index="2"] {
+  border-radius: 0 1rem 0 0;
+}
+
+.game-square[data-index="6"] {
+  border-radius: 0 0 0 1rem;
+}
+
+.game-square[data-index="8"] {
+  border-radius: 0 0 1rem 0;
+}
+
+.game-square p {
+  font-size: min(10vh, 10vw);
+}
